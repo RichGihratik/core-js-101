@@ -23,8 +23,10 @@
  *   getComposition(Math.sin, Math.asin)(x) => Math.sin(Math.asin(x))
  *
  */
-function getComposition(/* f, g */) {
-  throw new Error('Not implemented');
+function getComposition(f, g) {
+  return function (x) {
+    return f(g(x));
+  };
 }
 
 
@@ -44,8 +46,10 @@ function getComposition(/* f, g */) {
  *   power05(16) => 4
  *
  */
-function getPowerFunction(/* exponent */) {
-  throw new Error('Not implemented');
+function getPowerFunction(exponent) {
+  return function (x) {
+    return x ** exponent;
+  };
 }
 
 
@@ -62,27 +66,37 @@ function getPowerFunction(/* exponent */) {
  *   getPolynom(8)     => y = 8
  *   getPolynom()      => null
  */
-function getPolynom() {
-  throw new Error('Not implemented');
+function getPolynom(...args) {
+  const factors = args.reverse();
+  return function (x) {
+    let result = 0;
+    for (let i = 0; i < factors.length; i += 1) {
+      result += factors[i] * (x ** i);
+    }
+    return result;
+  };
 }
 
 
 /**
- * Memoizes passed function and returns function
+ * Memorizes passed function and returns function
  * which invoked first time calls the passed function and then always returns cached result.
  *
  * @params {Function} func - function to memoize
  * @return {Function} memoized function
  *
  * @example
- *   const memoizer = memoize(() => Math.random());
- *   memoizer() => some random number  (first run, evaluates the result of Math.random())
- *   memoizer() => the same random number  (second run, returns the previous cached result)
+ *   const memorizer = memoize(() => Math.random());
+ *   memorizer() => some random number  (first run, evaluates the result of Math.random())
+ *   memorizer() => the same random number  (second run, returns the previous cached result)
  *   ...
- *   memoizer() => the same random number  (next run, returns the previous cached result)
+ *   memorizer() => the same random number  (next run, returns the previous cached result)
  */
-function memoize(/* func */) {
-  throw new Error('Not implemented');
+function memoize(func) {
+  return function () {
+    this.num = this.num === undefined ? func() : this.num;
+    return this.num;
+  };
 }
 
 
@@ -101,8 +115,20 @@ function memoize(/* func */) {
  * }, 2);
  * retryer() => 2
  */
-function retry(/* func, attempts */) {
-  throw new Error('Not implemented');
+function retry(func, attempts) {
+  let retryer = function () {
+    try {
+      return func();
+    } catch (e) {
+      this.attempts -= 1;
+      if (this.attempts === 0) return func();
+      return retryer();
+    }
+  };
+  retryer = retryer.bind({
+    attempts,
+  });
+  return retryer;
 }
 
 
@@ -129,8 +155,14 @@ function retry(/* func, attempts */) {
  * cos(3.141592653589793) ends
  *
  */
-function logger(/* func, logFunc */) {
-  throw new Error('Not implemented');
+function logger(func, logFunc) {
+  return function (...args) {
+    const argsStr = args.map((arg) => JSON.stringify(arg)).join(',');
+    logFunc(`${func.name}(${argsStr}) starts`);
+    const value = func(...args);
+    logFunc(`${func.name}(${argsStr}) ends`);
+    return value;
+  };
 }
 
 
@@ -147,8 +179,18 @@ function logger(/* func, logFunc */) {
  *   partialUsingArguments(fn, 'a','b','c')('d') => 'abcd'
  *   partialUsingArguments(fn, 'a','b','c','d')() => 'abcd'
  */
-function partialUsingArguments(/* fn, ...args1 */) {
-  throw new Error('Not implemented');
+function partialUsingArguments(fn, ...args1) {
+  let resultFunc = function (...args) {
+    return fn(...this.args.concat(args));
+  };
+
+  const ctx = {
+    args: args1,
+  };
+
+  resultFunc = resultFunc.bind(ctx);
+
+  return resultFunc;
 }
 
 
@@ -169,8 +211,16 @@ function partialUsingArguments(/* fn, ...args1 */) {
  *   getId4() => 7
  *   getId10() => 11
  */
-function getIdGeneratorFunction(/* startFrom */) {
-  throw new Error('Not implemented');
+function getIdGeneratorFunction(startFrom) {
+  let func = function () {
+    const prev = this.counter;
+    this.counter += 1;
+    return prev;
+  };
+
+  const ctx = { counter: startFrom };
+  func = func.bind(ctx);
+  return func;
 }
 
 
