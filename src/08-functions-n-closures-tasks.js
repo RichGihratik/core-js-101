@@ -24,9 +24,10 @@
  *
  */
 function getComposition(f, g) {
-  return function (x) {
+  function result(x) {
     return f(g(x));
-  };
+  }
+  return result;
 }
 
 
@@ -47,9 +48,10 @@ function getComposition(f, g) {
  *
  */
 function getPowerFunction(exponent) {
-  return function (x) {
+  function result(x) {
     return x ** exponent;
-  };
+  }
+  return result;
 }
 
 
@@ -68,13 +70,14 @@ function getPowerFunction(exponent) {
  */
 function getPolynom(...args) {
   const factors = args.reverse();
-  return function (x) {
+  function resultFunc(x) {
     let result = 0;
     for (let i = 0; i < factors.length; i += 1) {
-      result += factors[i] * (x ** i);
+      result += factors[i] * x ** i;
     }
     return result;
-  };
+  }
+  return resultFunc;
 }
 
 
@@ -93,10 +96,11 @@ function getPolynom(...args) {
  *   memorizer() => the same random number  (next run, returns the previous cached result)
  */
 function memoize(func) {
-  return function () {
+  function result() {
     this.num = this.num === undefined ? func() : this.num;
     return this.num;
-  };
+  }
+  return result;
 }
 
 
@@ -116,7 +120,7 @@ function memoize(func) {
  * retryer() => 2
  */
 function retry(func, attempts) {
-  let retryer = function () {
+  let retryer = function someFunc() {
     try {
       return func();
     } catch (e) {
@@ -156,13 +160,14 @@ function retry(func, attempts) {
  *
  */
 function logger(func, logFunc) {
-  return function (...args) {
+  function result(...args) {
     const argsStr = args.map((arg) => JSON.stringify(arg)).join(',');
     logFunc(`${func.name}(${argsStr}) starts`);
     const value = func(...args);
     logFunc(`${func.name}(${argsStr}) ends`);
     return value;
-  };
+  }
+  return result;
 }
 
 
@@ -180,7 +185,7 @@ function logger(func, logFunc) {
  *   partialUsingArguments(fn, 'a','b','c','d')() => 'abcd'
  */
 function partialUsingArguments(fn, ...args1) {
-  let resultFunc = function (...args) {
+  let resultFunc = function someFunc(...args) {
     return fn(...this.args.concat(args));
   };
 
@@ -212,7 +217,7 @@ function partialUsingArguments(fn, ...args1) {
  *   getId10() => 11
  */
 function getIdGeneratorFunction(startFrom) {
-  let func = function () {
+  let func = function someFunc() {
     const prev = this.counter;
     this.counter += 1;
     return prev;
