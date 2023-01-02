@@ -63,8 +63,8 @@ function isLeapYear(date) {
  * Returns the string representation of the timespan between two dates.
  * The format of output string is "HH:mm:ss.sss"
  *
- * @param {date} startDate
- * @param {date} endDate
+ * @param {Date} startDate
+ * @param {Date} endDate
  * @return {string}
  *
  * @example:
@@ -75,13 +75,14 @@ function isLeapYear(date) {
  *    Date(2000,1,1,10,0,0),  Date(2000,1,1,15,20,10,453)   => "05:20:10.453"
  */
 function timeSpanToString(startDate, endDate) {
-  return new Date(endDate - startDate).toLocaleTimeString([], {
+  const date = new Date(endDate - startDate);
+  const ms = date.getMilliseconds().toString();
+  return `${date.toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
-    fractionalSecondDigits: 3,
     timeZone: 'UTC',
-  }).replace(',', '.');
+  })}.${ms + '0'.repeat(3 - ms.length)}`;
 }
 
 
